@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class BasePage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
+        self.wait = WebDriverWait(driver, 5)
 
     def find_element(self, locator):
         """Находит элемент с ожиданием"""
@@ -34,7 +34,6 @@ class BasePage:
             return True
         except TimeoutException:
             return False
-
 
     def wait_for_visible(self, locator):
         """Ожидает появления элемента"""
