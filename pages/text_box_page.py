@@ -3,7 +3,10 @@ import time
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 
+
 class TextBoxPage(BasePage):
+    PAGE_URL = "https://qa-guru.github.io/one-page-form/text-box.html"
+
     USER_NAME = (By.ID, "userName")
     USER_EMAIL = (By.ID, "userEmail")
     CURRENT_ADDRESS = (By.ID, "currentAddress")
@@ -11,6 +14,9 @@ class TextBoxPage(BasePage):
     SUBMIT = (By.ID, "submit")
     OUTPUT = (By.ID, "output")
 
+    def open(self):
+        """Открывает страницу TextBox"""
+        self.driver.get(self.PAGE_URL)
 
     def fill_form(self, name, email, current_address, permanent_address):
         """Заполняет форму"""
@@ -19,7 +25,7 @@ class TextBoxPage(BasePage):
         self.type_text(self.CURRENT_ADDRESS, current_address)
         self.type_text(self.PERMANENT_ADDRESS, permanent_address)
 
-    def submit_form (self):
+    def submit_form(self):
         """Отправляет форму"""
         self.click_element(self.SUBMIT)
 
@@ -43,4 +49,3 @@ class TextBoxPage(BasePage):
         self.scroll_to_result()
         time.sleep(2)
         self.wait_for_visible(self.OUTPUT)
-
