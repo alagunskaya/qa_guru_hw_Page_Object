@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from pages.text_box_page import TextBoxPage
 from pages.login_form_page import LoginPage
+from pages.registration_page import RegistrationPage
 
 
 @pytest.fixture
@@ -29,5 +30,13 @@ def text_box_page(driver):
 def login_page(driver):
     """Фикстура для страницы Login"""
     page = LoginPage(driver)
+    page.open()
+    return page
+
+
+@pytest.fixture
+def registration_page(driver):
+    """Фикстура для страницы Registration"""
+    page = RegistrationPage(driver)
     page.open()
     return page
