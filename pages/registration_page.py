@@ -1,4 +1,6 @@
+import os
 import time
+from selenium.webdriver.support import expected_conditions as EC
 
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
@@ -13,7 +15,6 @@ class RegistrationPage(BasePage):
     MOBILE_NUMBER = (By.CSS_SELECTOR, "#userNumber")
     DATE_INPUT = (By.CSS_SELECTOR, "#dateOfBirthInput")
     SUBJECTS_INPUT = (By.CSS_SELECTOR, "#subjectsInput")
-    SUBJECTS_MENU = (By.CSS_SELECTOR, "div[class='subjects-auto-complete__option']")
     PICTURE_INPUT = (By.CSS_SELECTOR, "#uploadPicture")
     CURRENT_ADDRESS = (By.CSS_SELECTOR, "#currentAddress")
     CITY_INPUT = (By.CSS_SELECTOR, "#city")
@@ -21,32 +22,20 @@ class RegistrationPage(BasePage):
     CITY_DROP_DOWN = (By.CSS_SELECTOR, "#stateCity-wrapper")
     STATE_DROP_DOWN = (By.CSS_SELECTOR, "#stateCity-wrapper")
     SUBMIT_BUTTON = (By.CSS_SELECTOR, "#submit")
-    MODAL_DIALOG = (By.CSS_SELECTOR, "#example-modal-sizes-title-lg")
     ERROR_MESSAGE = (By.CSS_SELECTOR, "#formError")
-    MODAL_DIALOG_RESULT = (By.CSS_SELECTOR, "#resultBody")
+    RESULT_BODY = (By.CSS_SELECTOR, "#resultBody")
 
     # Календарь
     DAY_OPTION = (By.CSS_SELECTOR,
                   "div.react-datepicker__day--0{padded_day}:not(.react-datepicker__day--outside-month)")
     YEAR_SELECT = (By.CSS_SELECTOR, "select[class='react-datepicker__year-select']")
-    MONS_SELECT = (By.CSS_SELECTOR, "select[class='react-datepicker__month-select']")
+    MONTH_SELECT = (By.CSS_SELECTOR, "select[class='react-datepicker__month-select']")
     CALENDAR = (By.CSS_SELECTOR, "div[class='react-datepicker__month-container']")
 
-    # Хобби
-    HOBBIES_MUSIC_INPUT = (By.ID, "hobbies-checkbox-3")
-    HOBBIES_SPORTS_INPUT = (By.ID, "hobbies-checkbox-1")
-    HOBBIES_READING_INPUT = (By.ID, "hobbies-checkbox-2")
-    HOBBY_LABEL_LOCATOR = (By.XPATH, "//label[contains(text(), '{hobby_name}')]")
-    HOBBIES_MUSIC_LABEL = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-3']")
-    HOBBIES_SPORTS_LABEL = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-1']")
-    HOBBIES_READING_LABEL = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-2']")
-
     def open(self):
-        """Открывает страницу"""
         self.driver.get(self.PAGE_URL)
 
     def close_banner(self):
-        """Закрывает баннер"""
         self.click_element((By.CSS_SELECTOR, "button[aria-label='Close']"))
 
     def input_first_name(self, first_name: str):
@@ -85,9 +74,57 @@ class RegistrationPage(BasePage):
             (By.CSS_SELECTOR, ".react-datepicker__day--020:not(.react-datepicker__day--outside-month)"))
         day_element.click()
 
-    def input_subjects(self, subject: str):
-        """Пока без выбора из списка"""
-        self.type_text(self.STATE_INPUT, subject)
+    def input_subjects(self, subjects: list | str):
+        subjects_list = subjects if isinstance(subjects, list) else [subjects]
+        input_subject = self.find_element(self.SUBJECTS_INPUT)
+
+        for subject in subjects_list:
+            input_subject.send_keys(subject)
+
+            # Ждем появления варианта в списке
+            first_option = (By.XPATH,
+                            f"//div[contains(@class, 'subjects-auto-complete__option') and text()='{subject}']")
+            self.wait.until(EC.visibility_of_element_located(first_option))
+
+            self.click_element(first_option)
+
+        self.driver.execute_script("arguments[0].blur();", input_subject)
+
+    def select_hobbies(self, hobbies: list | str):
+        hobbies_list = hobbies if isinstance(hobbies, list) else [hobbies]
+
+        for hobby in hobbies_list:
+            hobby_normalized = hobby.strip().capitalize()
+
+            locator = (By.XPATH, f"//label[contains(text(), '{hobby_normalized}')]")
+            self.click_element(locator)
+
+    def upload_picture(self):
+        """Загрузить файл"""
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        temp_file_path = os.path.abspath("test_image.jpg")
+        with open(temp_file_path, "w") as f:
+            f.write("Image data")
+
+        self.upload_file(self.PICTURE_INPUT, temp_file_path)
+
+    def select_state(self, state_name: str):
+        self.click_element(self.STATE_INPUT)
+        self.wait.until(EC.visibility_of_element_located(self.STATE_DROP_DOWN))
+
+        state_option = (By.XPATH, f"//div[@class='state-city-option' and text()='{state_name}']")
+        state = self.wait.until(EC.element_to_be_clickable(state_option))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", state)
+        self.driver.execute_script("arguments[0].click();", state)
+
+    def select_city(self, city_name: str):
+        self.click_element(self.CITY_INPUT)
+        self.wait.until(EC.visibility_of_element_located(self.CITY_DROP_DOWN))
+
+        city_option = (By.XPATH, f"//div[@class='state-city-option' and text()='{city_name}']")
+        city = self.wait.until(EC.element_to_be_clickable(city_option))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", city)
+        self.driver.execute_script("arguments[0].click();", city)
 
     def input_current_address(self, current_address: str):
         self.type_text(self.CURRENT_ADDRESS, current_address)
@@ -103,11 +140,57 @@ class RegistrationPage(BasePage):
 
     def get_result_form(self) -> str:
         """Получить форму с результатом"""
-        self.wait_for_visible(self.MODAL_DIALOG_RESULT)
-        return self.get_text(self.MODAL_DIALOG_RESULT)
+        self.wait_for_visible(self.RESULT_BODY)
+        return self.get_text(self.RESULT_BODY)
 
     def get_error_message(self) -> str:
         """Получить текст ошибки"""
         self.wait_for_visible(self.ERROR_MESSAGE)
         return self.get_text(self.ERROR_MESSAGE)
 
+    def fill_form(self, data: dict):
+        self.close_banner()
+        self.input_first_name(data["first_name"])
+        self.input_last_name(data["last_name"])
+        self.input_email(data["email"])
+        self.select_gender(data["gender"])
+        self.input_mobile_number(data["mobile"])
+        self.select_date_of_birth()
+        self.input_subjects(data["subjects"])
+        self.select_hobbies(data["hobbies"])
+        self.upload_picture()
+        self.input_current_address(data["current_address"])
+        self.select_state(data["state"])
+        self.select_city(data["city"])
+
+    def fill_form_partial(self, data: dict):
+        self.close_banner()
+        if "first_name" in data:
+            self.input_first_name(data["first_name"])
+
+        if "last_name" in data:
+            self.input_last_name(data["last_name"])
+
+        if "email" in data:
+            self.input_email(data["email"])
+
+        if "gender" in data:
+            self.select_gender(data["gender"])
+
+        if "mobile" in data:
+            self.input_mobile_number(data["mobile"])
+
+        if "subjects" in data:
+            self.input_subjects(data["subjects"])
+
+        if "hobbies" in data:
+            self.select_hobbies(data["hobbies"])
+
+        if "current_address" in data:
+            self.input_current_address(data["current_address"])
+
+        if "state" in data:
+            self.select_state(data["state"])
+
+        if "city" in data:
+            self.select_city(data["city"])

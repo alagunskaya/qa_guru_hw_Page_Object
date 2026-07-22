@@ -38,3 +38,8 @@ class BasePage:
     def wait_for_visible(self, locator):
         """Ожидает появления элемента"""
         self.wait.until(EC.visibility_of_element_located(locator))
+
+    def upload_file(self, locator, file_path: str):
+        """Найти инпут загрузки файла и передать путь"""
+        element = self.find_element(locator)
+        element.send_keys(file_path)
