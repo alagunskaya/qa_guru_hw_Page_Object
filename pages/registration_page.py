@@ -2,13 +2,13 @@ import os
 import time
 from selenium.webdriver.support import expected_conditions as EC
 
-from data.test_data_registration import RegistrationData
+from data.test_data_registration import RegistrationData, PartialRegistrationData
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 
 
 class RegistrationPage(BasePage):
-    PAGE_URL = "https://qa-guru.github.io/one-page-form/automation-practice-form.html"
+    PAGE_URL = "https://demo.qa.guru/one-page-form/automation-practice-form.html"
 
     FIRST_NAME = (By.CSS_SELECTOR, "#firstName")
     LAST_NAME = (By.CSS_SELECTOR, "#lastName")
@@ -81,14 +81,11 @@ class RegistrationPage(BasePage):
 
         for subject in subjects_list:
             input_subject.send_keys(subject)
-
             # Ждем появления варианта в списке
             first_option = (By.XPATH,
                             f"//div[contains(@class, 'subjects-auto-complete__option') and text()='{subject}']")
             self.wait.until(EC.visibility_of_element_located(first_option))
-
             self.click_element(first_option)
-
         self.driver.execute_script("arguments[0].blur();", input_subject)
 
     def select_hobbies(self, hobbies: list | str):
@@ -156,7 +153,7 @@ class RegistrationPage(BasePage):
         self.input_email(data.email)
         self.select_gender(data.gender)
         self.input_mobile_number(data.mobile)
-        self.select_date_of_birth(data.day, data.month, data.year)  # передаем числа
+        self.select_date_of_birth(data.day, data.month, data.year)
         self.input_subjects(data.subjects)
         self.select_hobbies(data.hobbies)
         self.upload_picture()
@@ -164,27 +161,28 @@ class RegistrationPage(BasePage):
         self.select_state(data.state)
         self.select_city(data.city)
 
-    def fill_form_partial(self, data: dict):
+    def fill_form_partial(self, data: PartialRegistrationData):
         self.close_banner()
-        if "first_name" in data:
-            self.input_first_name(data["first_name"])
-        if "last_name" in data:
-            self.input_last_name(data["last_name"])
-        if "email" in data:
-            self.input_email(data["email"])
-        if "gender" in data:
-            self.select_gender(data["gender"])
-        if "mobile" in data:
-            self.input_mobile_number(data["mobile"])
-        if "day" in data and "month" in data and "year" in data:
-            self.select_date_of_birth(data["day"], data["month"], data["year"])
-        if "subjects" in data:
-            self.input_subjects(data["subjects"])
-        if "hobbies" in data:
-            self.select_hobbies(data["hobbies"])
-        if "current_address" in data:
-            self.input_current_address(data["current_address"])
-        if "state" in data:
-            self.select_state(data["state"])
-        if "city" in data:
-            self.select_city(data["city"])
+
+        if data.first_name:
+            self.input_first_name(data.first_name)
+        if data.last_name:
+            self.input_last_name(data.last_name)
+        if data.email:
+            self.input_email(data.email)
+        if data.gender:
+            self.select_gender(data.gender)
+        if data.mobile:
+            self.input_mobile_number(data.mobile)
+        if data.day and data.month and data.year:
+            self.select_date_of_birth(data.day, data.month, data.year)
+        if data.subjects:
+            self.input_subjects(data.subjects)
+        if data.hobbies:
+            self.select_hobbies(data.hobbies)
+        if data.current_address:
+            self.input_current_address(data.current_address)
+        if data.state:
+            self.select_state(data.state)
+        if data.city:
+            self.select_city(data.city)

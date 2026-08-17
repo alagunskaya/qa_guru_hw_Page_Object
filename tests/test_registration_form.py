@@ -1,6 +1,11 @@
 import os
 import pytest
-from data.test_data_registration import REGISTRATION_TEST_DATA, RegistrationData
+from data.test_data_registration import (
+    REGISTRATION_TEST_DATA,
+    PARTIAL_TEST_DATA,
+    RegistrationData,
+    PartialRegistrationData
+)
 
 
 class TestRegistrationForm:
@@ -30,48 +35,13 @@ class TestRegistrationForm:
 
         assert registration_page.get_error_message() == "Please fill required fields and enter a valid 10-digit mobile number."
 
-    # @pytest.mark.parametrize("test_data", [
-    #     {
-    #         "last_name": "Петров",
-    #         "email": "ivan@test.com",
-    #         "gender": "Male",
-    #         "mobile": "1234567890",
-    #         "day": 20,
-    #         "month": 12,
-    #         "year": 1989
-    #     },
-    #     {
-    #         "first_name": "Иван",
-    #         "email": "ivan@test.com",
-    #         "gender": "Male",
-    #         "mobile": "1234567890",
-    #         "day": 20,
-    #         "month": 12,
-    #         "year": 1989
-    #     },
-    #     {
-    #         "first_name": "Иван",
-    #         "last_name": "Петров",
-    #         "email": "ivan@test.com",
-    #         "mobile": "1234567890",
-    #         "day": 20,
-    #         "month": 12,
-    #         "year": 1989
-    #     },
-    #     {
-    #         "first_name": "Иван",
-    #         "last_name": "Петров",
-    #         "email": "ivan@test.com",
-    #         "gender": "Male",
-    #         "day": 20,
-    #         "month": 12,
-    #         "year": 1989
-    #     }
-    # ], ids=["missing_first_name", "missing_last_name", "missing_gender", "missing_mobile"])
-    # def test_required_fields(self, registration_page, test_data):
-    #     registration_page.fill_form_partial(test_data)
-    #     registration_page.scroll_to_submit()
-    #     registration_page.click_submit_button()
-    #
-    #     error = registration_page.get_error_message()
-    #     assert "Please fill required fields and enter a valid 10-digit mobile number." in error
+    @pytest.mark.negative
+    @pytest.mark.parametrize("test_data", PARTIAL_TEST_DATA,
+                             ids=["missing_first_name", "missing_last_name", "missing_gender", "missing_mobile"])
+    def test_required_fields(self, registration_page, test_data: PartialRegistrationData):
+        registration_page.fill_form_partial(test_data)
+        registration_page.scroll_to_submit()
+        registration_page.click_submit_button()
+
+        error = registration_page.get_error_message()
+        assert "Please fill required fields and enter a valid 10-digit mobile number." in error
