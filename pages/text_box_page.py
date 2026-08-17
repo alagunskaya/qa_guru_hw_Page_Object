@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 
 
 class TextBoxPage(BasePage):
-    PAGE_URL = "https://qa-guru.github.io/one-page-form/text-box.html"
+    PAGE_URL = "https://demo.qa.guru/one-page-form/text-box.html"
 
     USER_NAME = (By.ID, "userName")
     USER_EMAIL = (By.ID, "userEmail")

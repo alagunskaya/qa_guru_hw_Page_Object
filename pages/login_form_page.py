@@ -3,7 +3,7 @@ from pages.base_page import BasePage
 
 
 class LoginPage(BasePage):
-    PAGE_URL = "https://qa-guru.github.io/one-page-form/login.html"
+    PAGE_URL = "https://demo.qa.guru/one-page-form/login.html"
 
     LOGIN_INPUT = (By.ID, "login-input")
     PASSWORD = (By.ID, "password-input")
