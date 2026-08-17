@@ -97,14 +97,16 @@ class RegistrationPage(BasePage):
             locator = (By.XPATH, f"//label[contains(text(), '{hobby_normalized}')]")
             self.click_element(locator)
 
-    def upload_picture(self):
-        """Загрузить файл"""
+    def upload_picture(self, file_path: str = None):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        temp_file_path = os.path.abspath("test_image.jpg")
-        with open(temp_file_path, "w") as f:
-            f.write("Image data")
 
-        self.upload_file(self.PICTURE_INPUT, temp_file_path)
+        if file_path is None:
+            temp_file_path = os.path.abspath("test_image.jpg")
+            with open(temp_file_path, "w") as f:
+                f.write("Image data")
+            file_path = temp_file_path
+
+        self.upload_file(self.PICTURE_INPUT, file_path)
 
     def select_state(self, state_name: str):
         self.click_element(self.STATE_INPUT)
