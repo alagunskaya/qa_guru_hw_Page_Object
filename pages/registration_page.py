@@ -2,6 +2,7 @@ import os
 import time
 from selenium.webdriver.support import expected_conditions as EC
 
+from data.test_data_registration import RegistrationData
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 
@@ -58,21 +59,21 @@ class RegistrationPage(BasePage):
     def input_mobile_number(self, mobile_number: str):
         self.type_text(self.MOBILE_NUMBER, mobile_number)
 
-    def select_date_of_birth(self):
-        """Временно, пока нет элемента - календарь"""
+    def select_date_of_birth(self, day: int, month: int, year: int):
         self.click_element(self.DATE_INPUT)
         self.wait_for_visible(self.CALENDAR)
-        month_select = self.find_element((By.CLASS_NAME, "react-datepicker__month-select"))
+
+        month_select = self.find_element(self.MONTH_SELECT)
         month_select.click()
-        month_select.find_element(By.XPATH, "//option[@value='11']").click()
+        month_select.find_element(By.XPATH, f"//option[@value='{month - 1}']").click()
 
-        year_select = self.find_element((By.CLASS_NAME, "react-datepicker__year-select"))
+        year_select = self.find_element(self.YEAR_SELECT)
         year_select.click()
-        year_select.find_element(By.XPATH, "//option[@value='1989']").click()
+        year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
 
-        day_element = self.find_element(
-            (By.CSS_SELECTOR, ".react-datepicker__day--020:not(.react-datepicker__day--outside-month)"))
-        day_element.click()
+        day_locator = (By.XPATH,
+                       f"//span[contains(@class, 'react-datepicker__day') and text()='{day}' and not(contains(@class, 'react-datepicker__day--outside-month'))]")
+        self.click_element(day_locator)
 
     def input_subjects(self, subjects: list | str):
         subjects_list = subjects if isinstance(subjects, list) else [subjects]
@@ -148,49 +149,42 @@ class RegistrationPage(BasePage):
         self.wait_for_visible(self.ERROR_MESSAGE)
         return self.get_text(self.ERROR_MESSAGE)
 
-    def fill_form(self, data: dict):
+    def fill_form(self, data: RegistrationData):
         self.close_banner()
-        self.input_first_name(data["first_name"])
-        self.input_last_name(data["last_name"])
-        self.input_email(data["email"])
-        self.select_gender(data["gender"])
-        self.input_mobile_number(data["mobile"])
-        self.select_date_of_birth()
-        self.input_subjects(data["subjects"])
-        self.select_hobbies(data["hobbies"])
+        self.input_first_name(data.first_name)
+        self.input_last_name(data.last_name)
+        self.input_email(data.email)
+        self.select_gender(data.gender)
+        self.input_mobile_number(data.mobile)
+        self.select_date_of_birth(data.day, data.month, data.year)  # передаем числа
+        self.input_subjects(data.subjects)
+        self.select_hobbies(data.hobbies)
         self.upload_picture()
-        self.input_current_address(data["current_address"])
-        self.select_state(data["state"])
-        self.select_city(data["city"])
+        self.input_current_address(data.current_address)
+        self.select_state(data.state)
+        self.select_city(data.city)
 
     def fill_form_partial(self, data: dict):
         self.close_banner()
         if "first_name" in data:
             self.input_first_name(data["first_name"])
-
         if "last_name" in data:
             self.input_last_name(data["last_name"])
-
         if "email" in data:
             self.input_email(data["email"])
-
         if "gender" in data:
             self.select_gender(data["gender"])
-
         if "mobile" in data:
             self.input_mobile_number(data["mobile"])
-
+        if "day" in data and "month" in data and "year" in data:
+            self.select_date_of_birth(data["day"], data["month"], data["year"])
         if "subjects" in data:
             self.input_subjects(data["subjects"])
-
         if "hobbies" in data:
             self.select_hobbies(data["hobbies"])
-
         if "current_address" in data:
             self.input_current_address(data["current_address"])
-
         if "state" in data:
             self.select_state(data["state"])
-
         if "city" in data:
             self.select_city(data["city"])
