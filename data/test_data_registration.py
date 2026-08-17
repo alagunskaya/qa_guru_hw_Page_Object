@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
@@ -19,6 +19,23 @@ class RegistrationData:
     city: str
 
 
+@dataclass
+class PartialRegistrationData:
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    gender: Optional[str] = None
+    mobile: Optional[str] = None
+    day: Optional[int] = None
+    month: Optional[int] = None
+    year: Optional[int] = None
+    subjects: Optional[List[str]] = None
+    hobbies: Optional[List[str]] = None
+    current_address: Optional[str] = None
+    state: Optional[str] = None
+    city: Optional[str] = None
+
+
 REGISTRATION_TEST_DATA = [
     RegistrationData(
         first_name="Мария",
@@ -34,5 +51,59 @@ REGISTRATION_TEST_DATA = [
         current_address="г. Санкт-Петербург",
         state="Uttar Pradesh",
         city="Agra"
+    ),
+    RegistrationData(
+        first_name="Иван",
+        last_name="Иванов",
+        email="ivan.ivanov@test.com",
+        gender="Male",
+        mobile="0987654321",
+        day=12,
+        month=8,
+        year=2009,
+        subjects=["Maths"],
+        hobbies=["Sports"],
+        current_address="г. Санкт-Петербург",
+        state="NCR",
+        city="Noida"
+    )
+]
+
+PARTIAL_TEST_DATA = [
+    PartialRegistrationData(
+        last_name="Петров",
+        email="ivan@test.com",
+        gender="Male",
+        mobile="1234567890",
+        day=20,
+        month=12,
+        year=1989
+    ),
+    PartialRegistrationData(
+        first_name="Иван",
+        email="ivan@test.com",
+        gender="Male",
+        mobile="1234567890",
+        day=20,
+        month=12,
+        year=1989
+    ),
+    PartialRegistrationData(
+        first_name="Иван",
+        last_name="Петров",
+        email="ivan@test.com",
+        mobile="1234567890",
+        day=20,
+        month=12,
+        year=1989
+    ),
+    PartialRegistrationData(
+        first_name="Иван",
+        last_name="Петров",
+        email="ivan@test.com",
+        gender="Male",
+        day=20,
+        month=12,
+        year=1989
     )
 ]
