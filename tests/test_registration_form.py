@@ -13,7 +13,7 @@ class TestRegistrationForm:
     @pytest.mark.positive
     @pytest.mark.parametrize("data", REGISTRATION_TEST_DATA, ids=["maria_ivanova", "ivan_ivanov"])
     def test_fill_form_positive(self, registration_page, data: RegistrationData):
-        registration_page.fill_form(data)
+        form = registration_page.fill_form(data)
         registration_page.click_submit_button()
 
         result = registration_page.get_result_form()

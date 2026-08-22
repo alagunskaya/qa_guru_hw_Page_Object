@@ -8,7 +8,8 @@ class TestTextBoxForm:
     @pytest.mark.parametrize("test_data", POSITIVE_TEST_DATA)
     def test_positive_valid_data(self, text_box_page, test_data):
         """Позитивный тест с валидными данными"""
-        text_box_page.fill_form(test_data["name"], test_data["email"], test_data["current_address"], test_data["permanent_address"])
+        text_box_page.fill_form(test_data["name"], test_data["email"], test_data["current_address"],
+                                test_data["permanent_address"])
         text_box_page.submit_form()
         text_box_page.wait_for_result()
         result_text = text_box_page.get_result_text()
@@ -58,7 +59,7 @@ class TestTextBoxForm:
     @pytest.mark.parametrize("payload", SQL_PAYLOADS)
     def test_security_sql_injection(self, text_box_page, payload):
         """Тест безопасности: SQL-инъекции"""
-        text_box_page.fill_form(payload, "ivanov@example.com", payload, payload)
+        form = text_box_page.fill_form(payload, "ivanov@example.com", payload, payload)
         text_box_page.submit_form()
         text_box_page.wait_for_result()
 
